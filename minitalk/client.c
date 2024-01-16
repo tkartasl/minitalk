@@ -6,7 +6,7 @@
 /*   By: tkartasl <tkartasl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:11:15 by tkartasl          #+#    #+#             */
-/*   Updated: 2024/01/12 16:41:33 by tkartasl         ###   ########.fr       */
+/*   Updated: 2024/01/16 13:13:16 by tkartasl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void	send_string(char *str, pid_t pid)
 			usleep(100);
 			pos--;
 		}
+		usleep(150);
 		str++;
 		pos = 7;
 	}

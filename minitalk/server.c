@@ -6,68 +6,71 @@
 /*   By: tkartasl <tkartasl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/10 08:11:26 by tkartasl          #+#    #+#             */
-/*   Updated: 2024/01/15 16:18:28 by tkartasl         ###   ########.fr       */
+/*   Updated: 2024/01/16 13:17:16 by tkartasl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void    get_string(int len, char c)
+/*void    get_string(int len, int bit_count, int signum)
 {
-	static char	binary[4095];
 	static int 	bit;
 	static char byte;
 	static int	i;
 
     if (i < len)
     {
-		if (c == '0')
+		if (signum == SIGUSR1)
 			byte &= ~(128 >> bit);
-		if (c == '1')
+		if (signum == SIGUSR2)
 			byte |= (128 >> bit);
 		bit++;
 		if (bit > 7)
 		{
 			bit = 0;
-			binary[i++] = byte;
+			write(1, &byte, 1);
 			byte = 0;
+			i++;
 		}
- 	}        
+ 	} 
 	if (i == len)
+	{
+		bit_count = 0;
+		i = 0;
+	}
+}*/
+
+void    get_string(int len, int bit_count, int signum)
+{
+	static char	binary[5512];
+	static int 	bit;
+	static char	byte;
+	static int	i;
+;
+    if (i < len)
+    {
+		if (signum == SIGUSR1)
+			byte &= ~(128 >> bit);
+		if (signum == SIGUSR2)
+			byte |= (128 >> bit);
+		bit++;
+		if (bit > 7)
+		{
+			bit = 0;
+			binary[i] = byte;
+			byte = 0;
+			i++;
+		}
+ 	}
+	if (i == len)        
 	{
 		binary[i] = 0;
 		ft_putstr_fd(binary, 1);
+		bit_count = 0;
+		i = 0;
+		ft_bzero(binary, 5512);
 	}
 }
-
-/*void    get_string(int len, char *str)
-{
-	char	binary[512];
-	int 	bit;
-	char 	byte;
-	int		i;
-
-	i = 0;
-	bit = 0;
-	byte = 0;
-    while (i < len)
-    {
-		if (*str == '0')
-			byte &= ~(128 >> bit);
-		if (*str == '1')
-			byte |= (128 >> bit);
-		bit++;
-		if (bit > 7)
-		{
-			bit = 0;
-			binary[i++] = byte;
-			byte = 0;
-		}
-		str++;
- 	}        
-	binary[i] = 0;
-	ft_putstr_fd(binary, 1);
-}*/
 
 int	ft_recursive_power(int nb, int power)
 {
@@ -109,6 +112,30 @@ void	sig_handler(int signum)
 	static char	lenbits[33];
 	static int	bit_count;			
 	static int	len;
+	
+	if (bit_count <= 31)
+	{
+		if (signum == SIGUSR1)
+			lenbits[bit_count] = '0';
+		if (signum == SIGUSR2)
+			lenbits[bit_count] = '1';
+		if (bit_count == 31)
+		{
+			lenbits[bit_count + 1] = 0;
+			len = get_len(lenbits);
+			ft_bzero(lenbits, 33);
+		}
+	}
+	else
+		get_string(len, bit_count, signum);
+	bit_count++;
+}
+
+/*void	sig_handler(int signum)
+{
+	static char	lenbits[33];
+	static int	bit_count;			
+	static int	len;
 	//static int	i;
 	//static char	string[4500];
 	
@@ -123,16 +150,16 @@ void	sig_handler(int signum)
 			lenbits[bit_count + 1] = 0;
 			len = get_len(lenbits);
 		}
-		bit_count++;
 	}
 	if (bit_count >= 32)
 	{
 		if (signum == SIGUSR1)
-			get_string(len, '0');
+			get_string(len, bit_count, '0');
 		if (signum == SIGUSR2)
-			get_string(len, '1');
+			get_string(len, bit_count, '1');
 	}
-}
+	bit_count++;
+}*/
 
 int	main()
 {		
